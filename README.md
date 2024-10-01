@@ -1,5 +1,5 @@
 # smart-contract_treino
-Simple smart contract example. Project from Web3 Week: https://www.luiztools.com.br/w3w
+Simple smart contract example from Web3 Week: https://www.luiztools.com.br/w3w
 
 # How to Run
 1. open https://remix.ethereum.org
