@@ -24,6 +24,8 @@ contract BetCandidate{
     Dispute public dispute;
     mapping(address => Bet) public allBets;
     address immutable  owner;
+    uint constant minimumDate = 1727820000; // 1 de outubro de 2024 às 18:00:00 GMT-04:00 
+    uint constant maximumDate = 1727830800; //1 de outubro de 2024 às 21:00:00 GMT-04:00
     uint constant fee = 1000; // 10% na escala de 4 zeros
     uint public netPrize;
     uint public comission;
@@ -47,7 +49,7 @@ contract BetCandidate{
         require(candidate ==  1 || candidate == 2, "Invalid Candidate");
         require(msg.value > 0, "Invalid Value");
         require(dispute.winner == 0, "Dispute Closed");
-        require(block.timestamp < 1727830800 , "Dispute Closed"); //Data limite para apostar
+        require(block.timestamp < maximumDate, "Bets closed"); //Data limite para apostar
         require(allBets[msg.sender].amount == 0, "User already placed a bet"); // Só aceita se o apostador não fez nenhuma aposta
 
         Bet memory newBet;
@@ -64,7 +66,7 @@ contract BetCandidate{
    
   
     function finish(uint winner) external {
-        require(block.timestamp > 1727820000 , "Dispute Closed"); //Data mínima para encerrar
+        require(block.timestamp > minimumDate, "Bets are still open."); //Data mínima para encerrar
         require(msg.sender == owner, "Invalid Account Owner");
         require(winner == 1 || winner == 2, "Invalid Candidate");
         require(dispute.winner == 0, "Dispute Closed");
@@ -90,6 +92,22 @@ contract BetCandidate{
         uint individualPrize = (netPrize * ratio) / 1e4;
         allBets[msg.sender].claimed = individualPrize;
         payable(msg.sender).transfer(individualPrize);
+    }
+
+    function setImage (uint _candidate, string memory _name, string memory _image) external{//função para alterar nome e imagem
+        require(msg.sender == owner, "Invalid Account Owner");
+        require(_candidate ==  1 || _candidate == 2, "Invalid Candidate");
+        require(bytes(_image).length > 0, "Invalid Image"); //verifica pelos bytes se a string é de uma imagem vazia
+
+
+        if (_candidate == 1){
+            dispute.candidate1 = _name;
+            dispute.image1 = _image;
+        }
+        else{
+            dispute.candidate2 = _name;
+            dispute.image2 = _image;
+        }
     }
 
 }
